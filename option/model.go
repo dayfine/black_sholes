@@ -2,8 +2,17 @@ package option
 
 import "math"
 
+type OptionType bool
+
+const (
+	CALL OptionType = true
+	PUT  OptionType = false
+)
+
 // A probablity distribution of a value.
 type Distribution interface {
+	// Probability density function.
+	Pdf(value float64) float64
 	// Cumulative distribution function.
 	Cdf(value float64) float64
 }
@@ -17,6 +26,10 @@ func MakeStdNormDist() *NormDist {
 
 type NormDist struct {
 	mean, stdDev float64
+}
+
+func (d *NormDist) Pdf(value float64) float64 {
+	return math.Exp(-math.Pow(value-d.mean, 2)/(2*d.stdDev*d.stdDev)) / (d.stdDev * math.Sqrt(math.Pi*2))
 }
 
 func (d *NormDist) Cdf(value float64) float64 {
@@ -49,10 +62,49 @@ type BlackSholeModel struct {
 	dist Distribution
 }
 
-func (m *BlackSholeModel) callPrice(p blackSholeModelParams) float64 {
-	return p.S*m.dist.Cdf(p.d1()) - p.K*math.Exp(-p.R*p.T)*m.dist.Cdf(p.d2())
+type BlackSholeModelResults struct {
+	Price, Delta, Gamma, Theta, Vega, Rho float64
 }
 
-func (m *BlackSholeModel) putPrice(p blackSholeModelParams) float64 {
-	return -p.S*m.dist.Cdf(-p.d1()) + p.K*math.Exp(-p.R*p.T)*m.dist.Cdf(-p.d2())
+func (m *BlackSholeModel) Calc(p blackSholeModelParams, optionType OptionType) BlackSholeModelResults {
+	return BlackSholeModelResults{
+		Price: m.Price(p, optionType),
+		Delta: m.Delta(p, optionType),
+		Gamma: m.Gamma(p, optionType),
+		Theta: m.Theta(p, optionType),
+		Vega:  m.Vega(p, optionType),
+		Rho:   m.Rho(p, optionType),
+	}
+}
+
+func (m *BlackSholeModel) Price(p blackSholeModelParams, optionType OptionType) float64 {
+	return p.S*m.Delta(p, optionType) - m.Rho(p, optionType)/p.T
+}
+
+func (m *BlackSholeModel) Delta(p blackSholeModelParams, optionType OptionType) float64 {
+	if optionType == CALL {
+		return m.dist.Cdf(p.d1())
+	} else {
+		return -m.dist.Cdf(-p.d1())
+	}
+}
+
+func (m *BlackSholeModel) Gamma(p blackSholeModelParams, optionType OptionType) float64 {
+	return m.dist.Pdf(p.d1()) / (p.S * p.V * math.Sqrt(p.T))
+}
+
+func (m *BlackSholeModel) Theta(p blackSholeModelParams, optionType OptionType) float64 {
+	return -p.V*.5*m.Vega(p, optionType)/p.T - p.R*m.Rho(p, optionType)/p.T
+}
+
+func (m *BlackSholeModel) Vega(p blackSholeModelParams, optionType OptionType) float64 {
+	return p.S * m.dist.Pdf(p.d1()) * math.Sqrt(p.T)
+}
+
+func (m *BlackSholeModel) Rho(p blackSholeModelParams, optionType OptionType) float64 {
+	if optionType == CALL {
+		return p.K * p.T * math.Exp(-p.R*p.T) * m.dist.Cdf(p.d2())
+	} else {
+		return -p.K * p.T * math.Exp(-p.R*p.T) * m.dist.Cdf(-p.d2())
+	}
 }
