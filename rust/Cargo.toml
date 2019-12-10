@@ -1,0 +1,10 @@
+[package]
+name = "black_shole"
+version = "0.1.0"
+authors = ["dayfine <26423504+dayfine@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+statrs = "0.12.0"
