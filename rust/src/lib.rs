@@ -1,3 +1,5 @@
+extern crate statrs;
+
 use statrs::function::erf::erf;
 use std::f64::consts::PI;
 
