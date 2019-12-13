@@ -1,0 +1,14 @@
+load("@io_bazel_rules_rust//rust:rust.bzl", "rust_library", "rust_test")
+
+rust_library(
+    name = "black_sholes",
+    srcs = ["src/lib.rs"],
+    deps = [
+        "//rust/cargo:statrs",
+    ],
+)
+
+rust_test(
+    name = "black_sholes_test",
+    crate = ":black_sholes",
+)

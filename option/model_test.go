@@ -9,6 +9,41 @@ func ExpectEq(t *testing.T, got, expected interface{}) {
 	}
 }
 
+func TestNormDist(t *testing.T) {
+	tests := []struct {
+		input, pdf, cdf float64
+	}{
+		{
+			0.0, 0.3989422804014327, 0.5,
+		},
+		{
+			0.1, 0.3969525474770118, 0.539827837277029,
+		},
+		{
+			0.5, 0.3520653267642995, 0.6914624612740131,
+		},
+		{
+			1.0, 0.24197072451914337, 0.8413447460685429,
+		},
+		{
+			-1.0, 0.24197072451914337, 0.15865525393145707,
+		},
+		{
+			3.0, 0.0044318484119380075, 0.9986501019683699,
+		},
+		{
+			-5.0, 1.4867195147342979e-06, 2.8665157186802404e-07,
+		},
+	}
+
+	dist := MakeStdNormDist()
+
+	for _, test := range tests {
+		ExpectEq(t, dist.Pdf(test.input), test.pdf)
+		ExpectEq(t, dist.Cdf(test.input), test.cdf)
+	}
+}
+
 func TestBlackSholeModel(t *testing.T) {
 	tests := []struct {
 		params blackSholeModelParams
