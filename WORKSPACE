@@ -55,6 +55,23 @@ go_embed_data_dependencies()
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 gazelle_dependencies()
 
+go_repository(
+    name = "com_github_google_go-cmp",
+    commit = "3af367b6b30c263d47e8895973edcca9a49cf029",
+    importpath = "github.com/google/go-cmp",
+)
+
+go_repository(
+    name = "com_github_d4l3k_messagediff",
+    commit = "b9e99b2f9263a86c71c1ca4507f34502448c58a4",
+    importpath = "github.com/d4l3k/messagediff",
+)
+
+go_repository(
+    name = "com_github_dayfine_base-go",
+    commit = "3aeebe3e6e13fea583050bca3d64edf5a526c795",
+    importpath = "github.com/dayfine/base-go",
+)
 
 # ================================================================
 # Rust extensions

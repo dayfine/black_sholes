@@ -1,13 +1,10 @@
 package option
 
-import "testing"
+import (
+	"testing"
 
-func ExpectEq(t *testing.T, got, expected interface{}) {
-	if expected != got {
-		t.Helper()
-		t.Errorf("Got: %T[%+v]\nExpected: %T[%+v]", got, got, expected, expected)
-	}
-}
+	. "github.com/dayfine/base-go/base/testing"
+)
 
 func TestNormDist(t *testing.T) {
 	tests := []struct {

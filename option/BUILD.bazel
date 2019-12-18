@@ -11,4 +11,7 @@ go_test(
     name = "go_default_test",
     srcs = ["model_test.go"],
     embed = [":go_default_library"],
+    deps = [
+        "@com_github_dayfine_base-go//base/testing:go_default_library",
+    ],
 )
